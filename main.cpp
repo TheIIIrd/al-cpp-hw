@@ -25,27 +25,29 @@ bool load_from_file(const std::string& path); // функция загрузки
 ~BSTree(); //деструктор
 */
 
-#include <iostream>
 #include "binstree.hpp"
 
 int main() {
   BSTree<int> test;
-  test.add_element(8);
-  test.add_element(4);
-  test.add_element(12);
-  test.add_element(2);
-  test.add_element(5);
-  test.add_element(9);
-  test.add_element(14);
-  test.add_element(3);
-  test.add_element(7);
-  test.add_element(10);
-  test.add_element(15);
-  test.add_element(16);
-  test.add_element(6);
-  test.add_element(11);
-  test.add_element(13);
-  test.add_element(1);
+  // test.add_element(8);
+  // test.add_element(4);
+  // test.add_element(12);
+  // test.add_element(2);
+  // test.add_element(5);
+  // test.add_element(9);
+  // test.add_element(14);
+  // test.add_element(3);
+  // test.add_element(7);
+  // test.add_element(10);
+  // test.add_element(15);
+  // test.add_element(16);
+  // test.add_element(6);
+  // test.add_element(11);
+  // test.add_element(13);
+  // test.add_element(1);
+
+  std::string path = "in.txt";
+  test.load_from_file(path);
 
   test.print_tree();
 
@@ -71,8 +73,13 @@ int main() {
 
   test.delete_element(5);
   test.delete_element(4);
+  test.delete_element(8);
+  test.delete_element(14);
 
   test.print_tree();
+  
+  path = "out.txt";
+  test.save_to_file(path);
 
   return 0;
 }

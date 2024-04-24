@@ -3,6 +3,7 @@
 
 // Объявляем шаблонный класс Node
 template <class T> class Node {
+
 private:
   T _DATA;      // Данные узла
   Node *_UP;    // Указатель на верхний узел
@@ -34,6 +35,19 @@ public:
   // Константный метод для получения данных узла
   const T get_const_data() const { return this->_DATA; }
 
+  // Декларация дружественных функций
+  template <class U> friend bool operator==(const Node<U> &, const Node<U> &);
+
+  template <class U> friend bool operator!=(const Node<U> &, const Node<U> &);
+
+  template <class U> friend bool operator<(const Node<U> &, const Node<U> &);
+
+  template <class U> friend bool operator>(const Node<U> &, const Node<U> &);
+
+  template <class U> friend bool operator<=(const Node<U> &, const Node<U> &);
+
+  template <class U> friend bool operator>=(const Node<U> &, const Node<U> &);
+
   // Конструктор по умолчанию
   Node() {
     this->_LEFT = nullptr;
@@ -51,7 +65,39 @@ public:
   }
 
   // Деструктор
-  ~Node(){};
+  ~Node(){
+      // delete _UP;
+      // delete _LEFT;
+      // delete _RIGHT;
+  };
 };
+
+// Дружественные функции для перегрузки операторов сравнения
+template <class T> bool operator==(const Node<T> &lhs, const Node<T> &rhs) {
+  if (lhs._UP == rhs._UP && lhs._LEFT == rhs._LEFT && lhs._RIGHT == rhs._RIGHT)
+    return lhs._DATA == rhs._DATA;
+  else
+    return false;
+}
+
+template <class T> bool operator!=(const Node<T> &lhs, const Node<T> &rhs) {
+  return lhs._DATA != rhs._DATA;
+}
+
+template <class T> bool operator<(const Node<T> &lhs, const Node<T> &rhs) {
+  return lhs._DATA < rhs._DATA;
+}
+
+template <class T> bool operator>(const Node<T> &lhs, const Node<T> &rhs) {
+  return lhs._DATA > rhs._DATA;
+}
+
+template <class T> bool operator<=(const Node<T> &lhs, const Node<T> &rhs) {
+  return lhs._DATA <= rhs._DATA;
+}
+
+template <class T> bool operator>=(const Node<T> &lhs, const Node<T> &rhs) {
+  return lhs._DATA >= rhs._DATA;
+}
 
 #endif
