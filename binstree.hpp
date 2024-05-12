@@ -2,29 +2,16 @@
 #define BINSTREEM_HPP_
 
 #include "binode.hpp"
-#include <iostream>
 #include <fstream>
+#include <iostream>
 
 template <class T> class BSTree {
 private:
   Node<T> *_HEAD; // Узел-корень бинарного дерева
 
-  void save_to_file_recursive(Node<T> *node, std::ofstream &file) {
-    if (node == nullptr) {
-      return;
-    }
-
-    // Рекурсивно сохраняем данные узла в файл
-    file << node->get_data() << " ";
-
-    save_to_file_recursive(node->get_left(), file);
-    save_to_file_recursive(node->get_right(), file);
-  }
-
   void clear_tree(Node<T> *node) {
-    if (node == nullptr) {
+    if (node == nullptr)
       return;
-    }
 
     clear_tree(node->get_left());
     clear_tree(node->get_right());
@@ -60,15 +47,18 @@ public:
     // добавить новый узел
     while (_CUR) {
       // Если значение нового узла больше или равно значению текущего узла
-      if (_TMP->get_data() >= _CUR->get_data()) {
+      if (_TMP->get_data() > _CUR->get_data()) {
 
         // Если у текущего узла нет правого потомка, добавляем новый узел справа
         if (!_CUR->get_right()) {
           _TMP->set_up(_CUR);
           _CUR->set_right(_TMP);
+
           return true;
+
         } else
-          _CUR = _CUR->get_right(); // Иначе двигаемся вправо по дереву
+          // Иначе двигаемся вправо по дереву
+          _CUR = _CUR->get_right();
 
         // Если значение нового узла меньше значения текущего узла
       } else {
@@ -78,8 +68,10 @@ public:
           _TMP->set_up(_CUR);
           _CUR->set_left(_TMP);
           return true;
+
         } else
-          _CUR = _CUR->get_left(); // Иначе двигаемся влево по дереву
+          // Иначе двигаемся влево по деревуs
+          _CUR = _CUR->get_left();
       }
     }
     return false; // Возвращаем false, если что-то пошло не так
@@ -111,33 +103,39 @@ public:
       return false; // Узел не найден
     }
 
-    if (value < current->get_data()) {
+    if (value < current->get_data())
       // Рекурсивный вызов для левого поддерева, если значение для удаления
       // меньше значения текущего узла
       return delete_element(current->get_left(), value);
-    } else if (value > current->get_data()) {
+
+    else if (value > current->get_data())
       // Рекурсивный вызов для правого поддерева, если значение для удаления
       // больше значения текущего узла
       return delete_element(current->get_right(), value);
-    } else {
+    else {
       // Узел с данным значением найден, начинаем процесс удаления
       if (!current->get_left()) {
         // Если у узла нет левого потомка
         Node<T> *temp = current->get_right();
+
         // Замена узла на его правого потомка
         transplant(current, current->get_right());
+
         // Удаление текущего узла
         delete current;
         return true;
+
       } else if (!current->get_right()) {
         // Если у узла нет правого потомка
         Node<T> *temp = current->get_left();
+
         // Замена узла на его левого потомка
         transplant(current, current->get_left());
 
         // Удаление текущего узла
         delete current;
         return true;
+
       } else {
         // Если у узла есть оба потомка
         // Находим минимальное значение в правом поддереве
@@ -154,6 +152,11 @@ public:
     }
 
     return false; // Неожиданный результат
+  }
+
+  // Обертка для вызова метода удаления элемента
+  bool delete_element(T _VALUE) {
+    return delete_element(this->get_head(), _VALUE);
   }
 
   Node<T> *find_min(Node<T> *current) {
@@ -183,11 +186,6 @@ public:
     }
   }
 
-  // Обертка для вызова метода удаления элемента
-  bool delete_element(T _VALUE) {
-    return delete_element(this->get_head(), _VALUE);
-  }
-
   // Метод для вывода дерева в терминал
   void print_tree(Node<T> *_NODE, int _DEPTH = 0) {
     if (_NODE == nullptr)
@@ -210,37 +208,52 @@ public:
   // Обертка для вызова метода с корневого узла
   void print_tree() { print_tree(this->get_head()); }
 
-  bool save_to_file(const std::string& path) {
-        std::ofstream file(path);
-        if (!file.is_open()) {
-            std::cerr << "Error: Unable to open file for writing." << std::endl;
-            return false;
-        }
+  bool save_to_file(Node<T> *node, std::ofstream &file) {
+    if (node == nullptr)
+      return true;
 
-        save_to_file_recursive(this->get_head(), file);
+    // Рекурсивно сохраняем данные узла в файл
+    file << node->get_data() << " ";
 
-        file.close();
-        return true;
+    save_to_file(node->get_left(), file);
+    save_to_file(node->get_right(), file);
+    return true;
+  }
+
+  // Обертка для вызова метода записи в файл
+  bool save_to_file(const std::string &path) {
+    std::ofstream file(path);
+    if (!file.is_open()) {
+      std::cerr << "[-] Error: Unable to open file for writing." << std::endl;
+      return false;
     }
 
-    bool load_from_file(const std::string& path) {
-        std::ifstream file(path);
-        if (!file.is_open()) {
-            std::cerr << "Error: Unable to open file for reading." << std::endl;
-            return false;
-        }
+    save_to_file(this->get_head(), file);
 
-        // Очищаем существующее дерево перед загрузкой новых данных
-        clear_tree(this->get_head());
+    file.close();
+    return true;
+  }
 
-        T value;
-        while (file >> value) {
-            add_element(value);
-        }
-
-        file.close();
-        return true;
+  bool load_from_file(const std::string &path) {
+    std::ifstream file(path);
+    if (!file.is_open()) {
+      std::cerr << "[-] Error: Unable to open file for reading." << std::endl;
+      return false;
     }
+
+    // Очищаем существующее дерево перед загрузкой новых данных
+    clear_tree(this->get_head());
+
+    T value;
+    while (file >> value) {
+      add_element(value);
+    }
+
+    file.close();
+    return true;
+  }
+
+  ~BSTree() {}
 };
 
 #endif

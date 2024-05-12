@@ -36,17 +36,13 @@ public:
   const T get_const_data() const { return this->_DATA; }
 
   // Декларация дружественных функций
-  template <class U> friend bool operator==(const Node<U> &, const Node<U> &);
+  friend bool operator<(const Node<T> &lhs, const Node<T> &rhs) {
+    return (lhs.get_const_data() < rhs.get_const_data());
+  }
 
-  template <class U> friend bool operator!=(const Node<U> &, const Node<U> &);
-
-  template <class U> friend bool operator<(const Node<U> &, const Node<U> &);
-
-  template <class U> friend bool operator>(const Node<U> &, const Node<U> &);
-
-  template <class U> friend bool operator<=(const Node<U> &, const Node<U> &);
-
-  template <class U> friend bool operator>=(const Node<U> &, const Node<U> &);
+  friend bool operator>(const Node<T> &lhs, const Node<T> &rhs) {
+    return (lhs.get_const_data() > rhs.get_const_data());
+  }
 
   // Конструктор по умолчанию
   Node() {
@@ -78,26 +74,6 @@ template <class T> bool operator==(const Node<T> &lhs, const Node<T> &rhs) {
     return lhs._DATA == rhs._DATA;
   else
     return false;
-}
-
-template <class T> bool operator!=(const Node<T> &lhs, const Node<T> &rhs) {
-  return lhs._DATA != rhs._DATA;
-}
-
-template <class T> bool operator<(const Node<T> &lhs, const Node<T> &rhs) {
-  return lhs._DATA < rhs._DATA;
-}
-
-template <class T> bool operator>(const Node<T> &lhs, const Node<T> &rhs) {
-  return lhs._DATA > rhs._DATA;
-}
-
-template <class T> bool operator<=(const Node<T> &lhs, const Node<T> &rhs) {
-  return lhs._DATA <= rhs._DATA;
-}
-
-template <class T> bool operator>=(const Node<T> &lhs, const Node<T> &rhs) {
-  return lhs._DATA >= rhs._DATA;
 }
 
 #endif

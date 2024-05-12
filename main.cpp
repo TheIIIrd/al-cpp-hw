@@ -26,60 +26,94 @@ bool load_from_file(const std::string& path); // функция загрузки
 */
 
 #include "binstree.hpp"
+#include <iostream>
 
 int main() {
   BSTree<int> test;
-  // test.add_element(8);
-  // test.add_element(4);
-  // test.add_element(12);
-  // test.add_element(2);
-  // test.add_element(5);
-  // test.add_element(9);
-  // test.add_element(14);
-  // test.add_element(3);
-  // test.add_element(7);
-  // test.add_element(10);
-  // test.add_element(15);
-  // test.add_element(16);
-  // test.add_element(6);
-  // test.add_element(11);
-  // test.add_element(13);
-  // test.add_element(1);
+  char _ANS;
 
-  std::string path = "in.txt";
-  test.load_from_file(path);
+  while (_ANS != '0') {
+    std::cout << "--- [B] BINSTREE TEST ---" << std::endl;
+    std::cout
+        << "1: add\n2: print\n3: find\n4: remove\n5: load\n6: save\n0: exit"
+        << std::endl;
 
-  test.print_tree();
+    std::cout << "[U] >>> ";
+    std::cin >> _ANS;
 
-  if (test.find_element(10))
-    std::cout << std::endl << "[+] Element found!" << std::endl;
-  else
-    std::cout << std::endl << "[-] Element not found!" << std::endl;
+    switch (_ANS) {
+    case '1': {
+      int _TMP;
+      std::cout << "[1] Value >>> ";
+      std::cin >> _TMP;
 
-  if (test.find_element(6))
-    std::cout << std::endl << "[+] Element found!" << std::endl;
-  else
-    std::cout << std::endl << "[-] Element not found!" << std::endl;
+      test.add_element(_TMP);
 
-  if (test.find_element(8))
-    std::cout << std::endl << "[+] Element found!" << std::endl;
-  else
-    std::cout << std::endl << "[-] Element not found!" << std::endl;
+      std::cout << std::endl;
+      break;
+    }
 
-  if (test.find_element(50))
-    std::cout << std::endl << "[+] Element found!" << std::endl;
-  else
-    std::cout << std::endl << "[-] Element not found!" << std::endl;
+    case '2': {
+      std::cout << "[2] Tree" << std::endl;
+      test.print_tree();
 
-  test.delete_element(5);
-  test.delete_element(4);
-  test.delete_element(8);
-  test.delete_element(14);
+      std::cout << std::endl;
+      break;
+    }
 
-  test.print_tree();
-  
-  path = "out.txt";
-  test.save_to_file(path);
+    case '3': {
+      int _TMP;
+      std::cout << "[3] Value >>> ";
+      std::cin >> _TMP;
 
+      if (test.find_element(_TMP))
+        std::cout << "[+] We found it!" << std::endl;
+      else
+        std::cout << "[-] There is no " << _TMP << std::endl;
+
+      std::cout << std::endl;
+      break;
+    }
+
+    case '4': {
+      int _TMP;
+      std::cout << "[4] Value >>> ";
+      std::cin >> _TMP;
+
+      if (test.delete_element(_TMP))
+        std::cout << "[+] Deleated" << std::endl;
+      else
+        std::cout << "[-] There is no " << _TMP << std::endl;
+
+      std::cout << std::endl;
+      break;
+    }
+
+    case '5': {
+      std::string _PATH;
+      std::cout << "[5] path >>>";
+      std::cin >> _PATH;
+
+      test.load_from_file(_PATH);
+
+      std::cout << std::endl;
+      break;
+    }
+
+    case '6': {
+      std::string _PATH;
+      std::cout << "[5] path >>>";
+      std::cin >> _PATH;
+
+      test.save_to_file(_PATH);
+
+      std::cout << std::endl;
+      break;
+    }
+
+    default:
+      return 0;
+    }
+  }
   return 0;
 }
