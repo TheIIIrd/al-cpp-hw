@@ -25,8 +25,7 @@ bool load_from_file(const std::string& path); // функция загрузки
 ~BSTree(); //деструктор
 */
 
-#include "binstree.hpp"
-#include <iostream>
+#include "bintree.hpp"
 
 int main() {
   BSTree<int> test;

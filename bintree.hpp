@@ -1,5 +1,5 @@
-#ifndef BINSTREEM_HPP_
-#define BINSTREEM_HPP_
+#ifndef BINTREE_HPP_
+#define BINTREE_HPP_
 
 #include "binode.hpp"
 #include <fstream>
@@ -9,14 +9,24 @@ template <class T> class BSTree {
 private:
   Node<T> *_HEAD; // Узел-корень бинарного дерева
 
-  void clear_tree(Node<T> *node) {
-    if (node == nullptr)
-      return;
-
-    clear_tree(node->get_left());
-    clear_tree(node->get_right());
-
-    delete node;
+  // Метод замены (переноса) узлов
+  void transplant(Node<T> *u, Node<T> *v) {
+    // Замена узла u на узел v
+    if (u->get_up() == nullptr) {
+      // Если узел u является корневым, заменяем корневой узел на v
+      this->_HEAD = v;
+    } else if (u == u->get_up()->get_left()) {
+      // Если u является левым потомком своего родителя, заменяем его родителю
+      // левого потомка на v
+      u->get_up()->set_left(v);
+    } else {
+      // Иначе, заменяем правого потомка родителя узла u на v
+      u->get_up()->set_right(v);
+    }
+    if (v != nullptr) {
+      // Устанавливаем указатель на родителя для узла v
+      v->set_up(u->get_up());
+    }
   }
 
 public:
@@ -26,19 +36,38 @@ public:
   // Получение константного указателя на корень
   const Node<T> *get_const_head() const { return this->_HEAD; }
 
+  // Конструктор по умолчанию
+  BSTree() { this->_HEAD; }
+
+  // Конструктор с инициализацией данных
+  BSTree(T _DATA) { this->_HEAD(_DATA); }
+
+  // Деструктор
+  ~BSTree() { clear_tree(this->_HEAD); };
+
+  // Метод реурсивного удаления дерева
+  void clear_tree(Node<T> *_NODE) {
+    if (_NODE == nullptr)
+      return;
+
+    clear_tree(_NODE->get_left());
+    clear_tree(_NODE->get_right());
+
+    delete _NODE;
+  }
+
   // Метод добавления элемента в дерево
   bool add_element(T _VALUE) {
     // Создание нового узла с переданным значением
     Node<T> *_TMP = new Node<T>(_VALUE);
-
+    // Проверка существоваия ноды
     if (!_TMP)
       return false;
 
     // Получаем указатель на текущий узел (начинаем с корня)
     Node<T> *_CUR = this->get_head();
-
     // Если дерево пустое, то устанавливаем новый узел как корень
-    if (!_CUR) {
+    if (!_CUR || !_CUR->get_data()) {
       this->_HEAD = _TMP;
       return true;
     }
@@ -46,14 +75,14 @@ public:
     // Пока текущий узел существует (проходим по дереву), определяем куда
     // добавить новый узел
     while (_CUR) {
-      // Если значение нового узла больше или равно значению текущего узла
+      if (_VALUE == _CUR->get_data()) return false;
+      // Если значение нового узла больше значения текущего узла
       if (_TMP->get_data() > _CUR->get_data()) {
 
         // Если у текущего узла нет правого потомка, добавляем новый узел справа
         if (!_CUR->get_right()) {
           _TMP->set_up(_CUR);
           _CUR->set_right(_TMP);
-
           return true;
 
         } else
@@ -62,7 +91,6 @@ public:
 
         // Если значение нового узла меньше значения текущего узла
       } else {
-
         // Если у текущего узла нет левого потомка, добавляем новый узел слева
         if (!_CUR->get_left()) {
           _TMP->set_up(_CUR);
@@ -74,7 +102,8 @@ public:
           _CUR = _CUR->get_left();
       }
     }
-    return false; // Возвращаем false, если что-то пошло не так
+    // Возвращаем false, если что-то пошло не так
+    return false;
   }
 
   // Метод поиска элемента
@@ -95,59 +124,62 @@ public:
   }
 
   // Обертка для вызова метода поиска элемента
-  bool find_element(T _VALUE) { return find_element(this->get_head(), _VALUE); }
+  bool find_element(T _VALUE) {
+    return find_element(this->get_head(), _VALUE);
+  }
 
-  bool delete_element(Node<T> *current, T value) {
+  // Метод удаления элемента
+  bool delete_element(Node<T> *_CUR, T _VALUE) {
     // Проверка: если текущий узел равен nullptr, то узел не найден
-    if (current == nullptr) {
-      return false; // Узел не найден
-    }
+    if (_CUR == nullptr)
+      // Узел не найден
+      return false;
 
-    if (value < current->get_data())
+    if (_VALUE < _CUR->get_data())
       // Рекурсивный вызов для левого поддерева, если значение для удаления
       // меньше значения текущего узла
-      return delete_element(current->get_left(), value);
+      return delete_element(_CUR->get_left(), _VALUE);
 
-    else if (value > current->get_data())
+    else if (_VALUE > _CUR->get_data())
       // Рекурсивный вызов для правого поддерева, если значение для удаления
       // больше значения текущего узла
-      return delete_element(current->get_right(), value);
+      return delete_element(_CUR->get_right(), _VALUE);
     else {
       // Узел с данным значением найден, начинаем процесс удаления
-      if (!current->get_left()) {
+      if (!_CUR->get_left()) {
         // Если у узла нет левого потомка
-        Node<T> *temp = current->get_right();
+        Node<T> *temp = _CUR->get_right();
 
         // Замена узла на его правого потомка
-        transplant(current, current->get_right());
+        transplant(_CUR, _CUR->get_right());
 
         // Удаление текущего узла
-        delete current;
+        delete _CUR;
         return true;
 
-      } else if (!current->get_right()) {
+      } else if (!_CUR->get_right()) {
         // Если у узла нет правого потомка
-        Node<T> *temp = current->get_left();
+        Node<T> *temp = _CUR->get_left();
 
         // Замена узла на его левого потомка
-        transplant(current, current->get_left());
+        transplant(_CUR, _CUR->get_left());
 
         // Удаление текущего узла
-        delete current;
+        delete _CUR;
         return true;
 
       } else {
         // Если у узла есть оба потомка
         // Находим минимальное значение в правом поддереве
-        Node<T> *min_right = find_min(current->get_right());
+        Node<T> *min_right = find_min(_CUR->get_right());
 
         // Замена значения текущего узла на
         // минимальное значение из правого поддерева
-        current->set_data(min_right->get_data());
+        _CUR->set_data(min_right->get_data());
 
         // Рекурсивный вызов для удаления узла с
         // минимальным значением из правого поддерева
-        return delete_element(current->get_right(), min_right->get_data());
+        return delete_element(_CUR->get_right(), min_right->get_data());
       }
     }
 
@@ -159,31 +191,13 @@ public:
     return delete_element(this->get_head(), _VALUE);
   }
 
-  Node<T> *find_min(Node<T> *current) {
+  // Метод поиска наименьшего элемента
+  Node<T> *find_min(Node<T> *_CUR) {
     // Нахождение минимального узла (поиск крайнего левого узла)
-    while (current->get_left()) {
-      current = current->get_left();
+    while (_CUR->get_left()) {
+      _CUR = _CUR->get_left();
     }
-    return current;
-  }
-
-  void transplant(Node<T> *u, Node<T> *v) {
-    // Замена узла u на узел v
-    if (u->get_up() == nullptr) {
-      // Если узел u является корневым, заменяем корневой узел на v
-      this->_HEAD = v;
-    } else if (u == u->get_up()->get_left()) {
-      // Если u является левым потомком своего родителя, заменяем его родителю
-      // левого потомка на v
-      u->get_up()->set_left(v);
-    } else {
-      // Иначе, заменяем правого потомка родителя узла u на v
-      u->get_up()->set_right(v);
-    }
-    if (v != nullptr) {
-      // Устанавливаем указатель на родителя для узла v
-      v->set_up(u->get_up());
-    }
+    return _CUR;
   }
 
   // Метод для вывода дерева в терминал
@@ -208,35 +222,37 @@ public:
   // Обертка для вызова метода с корневого узла
   void print_tree() { print_tree(this->get_head()); }
 
-  bool save_to_file(Node<T> *node, std::ofstream &file) {
+   // Метод записи в файл
+  bool save_to_file(Node<T> *node, std::ofstream &_FILE) {
     if (node == nullptr)
       return true;
 
     // Рекурсивно сохраняем данные узла в файл
-    file << node->get_data() << " ";
+    _FILE << node->get_data() << " ";
 
-    save_to_file(node->get_left(), file);
-    save_to_file(node->get_right(), file);
+    save_to_file(node->get_left(), _FILE);
+    save_to_file(node->get_right(), _FILE);
     return true;
   }
 
   // Обертка для вызова метода записи в файл
-  bool save_to_file(const std::string &path) {
-    std::ofstream file(path);
-    if (!file.is_open()) {
+  bool save_to_file(const std::string &_PATH) {
+    std::ofstream _FILE(_PATH);
+    if (!_FILE.is_open()) {
       std::cerr << "[-] Error: Unable to open file for writing." << std::endl;
       return false;
     }
 
-    save_to_file(this->get_head(), file);
+    save_to_file(this->get_head(), _FILE);
 
-    file.close();
+    _FILE.close();
     return true;
   }
 
-  bool load_from_file(const std::string &path) {
-    std::ifstream file(path);
-    if (!file.is_open()) {
+  // Метод чтения из файла
+  bool load_from_file(const std::string &_PATH) {
+    std::ifstream _FILE(_PATH);
+    if (!_FILE.is_open()) {
       std::cerr << "[-] Error: Unable to open file for reading." << std::endl;
       return false;
     }
@@ -245,15 +261,13 @@ public:
     clear_tree(this->get_head());
 
     T value;
-    while (file >> value) {
+    while (_FILE >> value) {
       add_element(value);
     }
 
-    file.close();
+    _FILE.close();
     return true;
   }
-
-  ~BSTree() {}
 };
 
 #endif

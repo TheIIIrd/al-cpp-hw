@@ -36,12 +36,28 @@ public:
   const T get_const_data() const { return this->_DATA; }
 
   // Декларация дружественных функций
-  friend bool operator<(const Node<T> &lhs, const Node<T> &rhs) {
-    return (lhs.get_const_data() < rhs.get_const_data());
+  friend bool operator<(Node<T> &_LEFTNODE, Node<T> &_RIGHTNODE) {
+    if (_LEFTNODE.get_data() < _RIGHTNODE.get_data())
+      return true;
+    else
+      return false;
   }
 
-  friend bool operator>(const Node<T> &lhs, const Node<T> &rhs) {
-    return (lhs.get_const_data() > rhs.get_const_data());
+  friend bool operator>(Node<T> &_LEFTNODE, Node<T> &_RIGHTNODE) {
+    if (_LEFTNODE.get_data() > _RIGHTNODE.get_data())
+      return true;
+    else
+      return false;
+  }
+
+  friend bool operator==(Node<T> &_LEFTNODE, Node<T> &_RIGHTNODE) {
+    if (_LEFTNODE.get_data() == _RIGHTNODE.get_data() &&
+        _LEFTNODE.get_up() == _RIGHTNODE.get_up() &&
+        _LEFTNODE.get_left() == _RIGHTNODE.get_left() &&
+        _LEFTNODE.get_right() == _LEFTNODE.get_right())
+      return true;
+    else
+      return false;
   }
 
   // Конструктор по умолчанию
@@ -49,7 +65,7 @@ public:
     this->_LEFT = nullptr;
     this->_RIGHT = nullptr;
     this->_UP = nullptr;
-    this->_DATA = 0;
+    this->_DATA = 0.;
   }
 
   // Конструктор с инициализацией данных
@@ -61,19 +77,7 @@ public:
   }
 
   // Деструктор
-  ~Node(){
-      // delete _UP;
-      // delete _LEFT;
-      // delete _RIGHT;
-  };
+  ~Node(){};
 };
-
-// Дружественные функции для перегрузки операторов сравнения
-template <class T> bool operator==(const Node<T> &lhs, const Node<T> &rhs) {
-  if (lhs._UP == rhs._UP && lhs._LEFT == rhs._LEFT && lhs._RIGHT == rhs._RIGHT)
-    return lhs._DATA == rhs._DATA;
-  else
-    return false;
-}
 
 #endif
