@@ -53,7 +53,7 @@ int main() {
     }
 
     case '2': {
-      std::cout << "[2] Tree" << std::endl;
+      std::cout << "[2] Tree" << std::endl << std::endl;
       test.print_tree();
 
       std::cout << std::endl;
