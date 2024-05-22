@@ -90,7 +90,7 @@ int main() {
 
     case '5': {
       std::string _PATH;
-      std::cout << "[5] path >>>";
+      std::cout << "[5] path >>> ";
       std::cin >> _PATH;
 
       test.load_from_file(_PATH);
@@ -101,7 +101,7 @@ int main() {
 
     case '6': {
       std::string _PATH;
-      std::cout << "[5] path >>>";
+      std::cout << "[6] path >>> ";
       std::cin >> _PATH;
 
       test.save_to_file(_PATH);
